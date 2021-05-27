@@ -275,8 +275,18 @@ ffa_partition_probe(const uuid_t *uuid, struct ffa_partition_info **buffer)
 	struct ffa_partition_info *pbuf;
 
 	export_uuid((u8 *)uuid0_4, uuid);
+
+#if 0
 	count = __ffa_partition_info_get(uuid0_4[0], uuid0_4[1], uuid0_4[2],
 					 uuid0_4[3], NULL, 0);
+#else
+	/* hack for optee UUID endianess issue */
+	count = __ffa_partition_info_get(be32_to_cpup(&uuid0_4[0]),
+					 be32_to_cpup(&uuid0_4[1]),
+					 be32_to_cpup(&uuid0_4[2]),
+					 be32_to_cpup(&uuid0_4[3]), NULL, 0);
+#endif
+
 	if (count <= 0)
 		return count;
 
@@ -284,8 +294,17 @@ ffa_partition_probe(const uuid_t *uuid, struct ffa_partition_info **buffer)
 	if (!pbuf)
 		return -ENOMEM;
 
+#if 0
 	count = __ffa_partition_info_get(uuid0_4[0], uuid0_4[1], uuid0_4[2],
 					 uuid0_4[3], pbuf, count);
+#else
+	/* hack for optee UUID endianess issue */
+	count = __ffa_partition_info_get(be32_to_cpup(&uuid0_4[0]),
+					 be32_to_cpup(&uuid0_4[1]),
+					 be32_to_cpup(&uuid0_4[2]),
+					 be32_to_cpup(&uuid0_4[3]),
+					 pbuf, count);
+#endif
 	if (count <= 0)
 		kfree(pbuf);
 	else
